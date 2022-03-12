@@ -19,7 +19,7 @@ func (h *Handler) GetResults(c *gin.Context) {
 	}
 	buffer := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buffer, file); err != nil {
-		c.String(http.StatusBadRequest, "cannot find  file with suites.json")
+		c.String(http.StatusBadRequest, "cannot read file")
 		return
 	}
 
