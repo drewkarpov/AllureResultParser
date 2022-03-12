@@ -3,6 +3,7 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -14,12 +15,12 @@ type Handler struct {
 func (h *Handler) GetResults(c *gin.Context) {
 	file, _, err := c.Request.FormFile("file")
 	if err != nil {
-		c.String(http.StatusBadRequest, "cannot find  file with suites.json")
+		c.String(http.StatusBadRequest, fmt.Sprintf("cannot find  file with suites.json\nerror:%s", err))
 		return
 	}
 	buffer := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buffer, file); err != nil {
-		c.String(http.StatusBadRequest, "cannot read file")
+		c.String(http.StatusBadRequest, fmt.Sprintf("cannot read file\nerror:%s", err))
 		return
 	}
 
