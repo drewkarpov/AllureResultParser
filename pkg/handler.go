@@ -3,7 +3,6 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -13,17 +12,23 @@ type Handler struct {
 }
 
 func (h *Handler) GetResults(c *gin.Context) {
+	emptyString := ""
 	file, _, err := c.Request.FormFile("file")
 	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("cannot find  file with suites.json\nerror:%s", err))
+		c.String(http.StatusBadRequest, emptyString)
 		return
 	}
 	buffer := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buffer, file); err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("cannot read file\nerror:%s", err))
+		c.String(http.StatusBadRequest, emptyString)
 		return
 	}
+	baseUrl := c.Request.URL.Query().Get("baseUrl")
 
+	if baseUrl == "" {
+		c.String(http.StatusBadRequest, emptyString)
+		return
+	}
 	result := Result{}
 
 	err = json.Unmarshal(buffer.Bytes(), &result)
@@ -39,9 +44,8 @@ func (h *Handler) GetResults(c *gin.Context) {
 		suiteResult := SuiteResult{}
 		failedTests = append(failedTests, suiteResult.findSuitesWithParentId(suite)...)
 	}
-	GetPreparedResults(failedTests)
 
-	c.String(http.StatusOK, GetPreparedResults(failedTests))
+	c.String(http.StatusOK, GetPreparedResults(baseUrl, failedTests))
 }
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()

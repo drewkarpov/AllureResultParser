@@ -22,7 +22,7 @@ type SuiteResult struct {
 	Results []Suite
 }
 
-func GetPreparedResults(tests []Suite) string {
+func GetPreparedResults(baseUrl string, tests []Suite) string {
 	var failedTests []string
 	var brokenTests []string
 
@@ -30,9 +30,9 @@ func GetPreparedResults(tests []Suite) string {
 		resultPath := fmt.Sprintf("/#suites/%s/%s/", result.ParentUid, result.Uid)
 		switch result.Status {
 		case "broken":
-			brokenTests = append(brokenTests, resultPath)
+			brokenTests = append(brokenTests, baseUrl+resultPath)
 		case "failed":
-			failedTests = append(failedTests, resultPath)
+			failedTests = append(failedTests, baseUrl+resultPath)
 		}
 	}
 	var finalResult string
